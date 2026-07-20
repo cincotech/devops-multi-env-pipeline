@@ -1,0 +1,29 @@
+---
+
+- name: Create application directory
+
+  file:
+
+    path: /opt/devops-platform
+
+    state: directory
+
+    owner: devops
+
+    group: devops
+
+    mode: '0755'
+
+
+
+- name: Copy docker compose
+
+  copy:
+
+    src: ../../../docker-compose.yml
+
+    dest: /opt/devops-platform/docker-compose.yml
+
+    owner: devops
+
+    group: devops

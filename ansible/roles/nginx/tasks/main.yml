@@ -1,0 +1,18 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for roles/nginx
+- name: Créer le dossier de déploiement
+  ansible.builtin.file:
+    path: /opt/devops-platform
+    state: directory
+    owner: devops
+    group: devops
+    mode: '0755'
+
+- name: Copier docker-compose.yml
+  ansible.builtin.copy:
+    src: docker-compose.yml
+    dest: /opt/devops-platform/docker-compose.yml
+    owner: devops
+    group: devops
+    mode: '0644'

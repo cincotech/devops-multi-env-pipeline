@@ -1,0 +1,23 @@
+---
+- name: Installation serveur Web
+  hosts: webservers
+  become: yes
+
+  tasks:
+
+    - name: Mise à jour APT
+      apt:
+        update_cache: yes
+
+
+    - name: Installer Nginx
+      apt:
+        name: nginx
+        state: present
+
+
+    - name: Démarrer Nginx
+      service:
+        name: nginx
+        state: started
+        enabled: yes

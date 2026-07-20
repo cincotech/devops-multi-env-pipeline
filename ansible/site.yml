@@ -1,0 +1,11 @@
+---
+- name: Configuration de la VM-APP
+  hosts: app
+  become: true
+
+  roles:
+    - docker
+    - docker-compose
+    - nginx
+    - nodejs
+    - node_exporter

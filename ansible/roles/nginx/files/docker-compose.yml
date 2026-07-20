@@ -1,0 +1,23 @@
+services:
+
+  web:
+
+    image: ${IMAGE_NAME}:${IMAGE_VERSION}
+
+    container_name: devops-platform
+
+    restart: unless-stopped
+
+    ports:
+
+      - "${HOST_PORT}:${CONTAINER_PORT}"
+
+    healthcheck:
+
+      test: ["CMD","wget","--spider","-q","http://localhost"]
+
+      interval: 30s
+
+      timeout: 5s
+
+      retries: 3

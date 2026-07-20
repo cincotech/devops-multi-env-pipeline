@@ -1,0 +1,84 @@
+name: CI - Build and Push to GHCR
+
+on:
+  push:
+    branches: ["main"]
+    tags: ["v*"]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: cincotech/devops-platform
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+      security-events: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=raw,value=latest
+            type=sha,prefix=,format=long
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./docker/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      # --- TRIVY SECURITY SCAN ---
+      - name: Scan image with Trivy
+        uses: aquasecurity/trivy-action@v0.20.0
+        with:
+          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          format: table
+          exit-code: 1
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+
+      # --- DEPLOY ---
+      - name: Deploy application
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ vars.VM_HOST }}
+          username: ${{ vars.VM_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /opt/devops-platform
+            
+            # 1. Télécharger la toute dernière version de l'image fraîchement poussée
+            docker pull ghcr.io/cincotech/devops-platform:latest
+            
+            # 2. Nettoyer l'ancienne instance pour libérer proprement les ressources
+            docker compose down --remove-orphans
+            
+            # 3. Écrire le fichier .env de manière sécurisée pour Docker Compose
+            echo "IMAGE_NAME=ghcr.io/cincotech/devops-platform" > .env
+            echo "IMAGE_VERSION=latest" >> .env
+            echo "HOST_PORT=8080" >> .env
+            echo "CONTAINER_PORT=80" >> .env
+            
+            # 4. Relancer le conteneur en arrière-plan (il lira le .env automatiquement)
+            docker compose up -d
