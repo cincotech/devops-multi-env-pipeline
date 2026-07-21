@@ -18,6 +18,7 @@ jobs:
         with:
           host: ${{ secrets.VM_HOST_DEV }}
           username: ${{ secrets.VM_USER }}
+          port: ${{ secrets.VM_PORT_DEV}}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             mkdir -p /opt/devops-platform
@@ -43,6 +44,7 @@ jobs:
         with:
           host: ${{ secrets.VM_HOST_PROD }}
           username: ${{ secrets.VM_USER }}
+          port: ${{ secrets.VM_PORT_PROD}}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             mkdir -p /opt/devops-platform
