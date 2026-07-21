@@ -13,6 +13,15 @@ jobs:
     # S'exécute uniquement si la CI a réussi ET que la branche modifiée était 'develop'
     if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'develop' }}
     steps:
+       # <-- Ajouter cette étape ici
+      - name: Debug SSH configuration
+        run: |
+          echo "Host: ${{ secrets.VM_HOST_DEV }}"
+          echo "User: ${{ secrets.VM_USER }}"
+          echo "Port length: ${#PORT}"
+        env:
+          PORT: ${{ secrets.VM_PORT_DEV }}
+
       - name: Déploiement applicatif distant sur VP-DEV via SSH
         uses: appleboy/ssh-action@v1
         with:
