@@ -1,11 +1,11 @@
 ---
-- name: Configuration de la VM-APP
-  hosts: app
+- name: Configuration complète des VM-DEV et VM-PROD
+  hosts: all
   become: true
 
   roles:
     - docker
     - docker-compose
-    - nginx
+    - nginx_config
     - nodejs
     - node_exporter

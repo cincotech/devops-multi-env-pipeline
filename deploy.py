@@ -17,7 +17,7 @@ from pathlib import Path
 
 
 # Répertoires du projet
-BASE_DIR = Path.home() / "devops-platform"
+BASE_DIR = Path.home() / "devops-multi-env-pipeline"
 
 TERRAFORM_DIR = BASE_DIR / "terraform"
 ANSIBLE_DIR = BASE_DIR / "ansible"

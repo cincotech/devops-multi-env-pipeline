@@ -51,7 +51,7 @@ variable "default_memory" {
 variable "default_disk_size" {
   description = "Taille du disque (Go)"
   type        = number
-  default     = 50
+  default     = 100
 }
 
 #############################################

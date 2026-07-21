@@ -1,22 +1,19 @@
 version: '3.8'
 
 services:
-  # Votre conteneur applicatif principal
   devops-platform:
     image: devops-platform:latest
     container_name: devops-platform
     expose:
-      - "3000"  # Le port interne sur lequel votre application écoute
+      - "3000"
     restart: always
 
-  # Le Reverse Proxy Nginx
   reverse-proxy:
     image: nginx:alpine
     container_name: nginx_proxy
     ports:
-      - "80:80" # Écoute sur le port 80 de la VM (VM-DEV ou VM-PROD)
+      - "{{ nginx_port }}:80"
     volumes:
-      # Montage du volume hébergé sur la VM vers le conteneur Nginx
       - /opt/devops-platform/nginx/conf.d:/etc/nginx/conf.d:ro
     depends_on:
       - devops-platform

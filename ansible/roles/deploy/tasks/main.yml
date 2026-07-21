@@ -1,3 +1,17 @@
 #SPDX-License-Identifier: MIT-0
 ---
-# tasks file for roles/deploy
+- name: S'assurer que le dossier racine du projet existe
+  ansible.builtin.file:
+    path: /opt/devops-platform
+    state: directory
+    owner: devops
+    group: devops
+    mode: '0755'
+
+- name: Déployer le fichier docker-compose.yml dynamique
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: /opt/devops-platform/docker-compose.yml
+    owner: devops
+    group: devops
+    mode: '0644'# tasks file for roles/deploy

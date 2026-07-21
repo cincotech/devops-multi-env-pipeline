@@ -16,4 +16,13 @@ provider "proxmox" {
   api_token = var.proxmox_api_token
 
   insecure = true
+  #
+  ssh {
+   agent = true
+   username = "root"
+   node {
+     name = "upg"
+     address = "192.168.0.11"
+   }   
+  }
 }

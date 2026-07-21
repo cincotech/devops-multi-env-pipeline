@@ -1,0 +1,22 @@
+---
+- name: Créer le dossier de configuration Nginx sur la VM
+  ansible.builtin.file:
+    path: /opt/devops-platform/nginx/conf.d
+    state: directory
+    owner: devops
+    group: devops
+    mode: '0755'
+
+- name: Déployer la configuration Nginx dynamique
+  ansible.builtin.template:
+    src: nginx.conf.j2
+    dest: /opt/devops-platform/nginx/conf.d/default.conf
+    owner: devops
+    group: devops
+    mode: '0644'
+
+- name: Autoriser le port HTTP personnalisé dans UFW
+  community.general.ufw:
+    rule: allow
+    port: "{{ nginx_port }}"
+    proto: tcp
