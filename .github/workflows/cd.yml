@@ -19,8 +19,8 @@ jobs:
           username: ${{ secrets.VM_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            mkdir -p /opt/devops-platform-dev
-            cd /opt/devops-platform-dev
+            mkdir -p /opt/devops-platform
+            cd /opt/devops-platform
             
             echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             
@@ -44,8 +44,8 @@ jobs:
           username: ${{ secrets.VM_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            mkdir -p /opt/devops-platform-prod
-            cd /opt/devops-platform-prod
+            mkdir -p /opt/devops-platform
+            cd /opt/devops-platform
             
             echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             
