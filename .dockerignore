@@ -1,0 +1,29 @@
+# Git
+.git
+.gitignore
+
+# Terraform
+terraform/
+.terraform/
+
+# Ansible
+ansible/
+ansible-env/
+
+# Python
+__pycache__/
+*.pyc
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Documentation
+README.md
+
+# Variables d'environnement
+.env
+.env.*
