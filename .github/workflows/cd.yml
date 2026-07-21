@@ -27,8 +27,9 @@ jobs:
         with:
           host: ${{ secrets.VM_HOST_DEV }}
           username: ${{ secrets.VM_USER }}
-          port: ${{ secrets.VM_PORT_DEV}}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 2224
+
           script: |
             mkdir -p /opt/devops-platform
             cd /opt/devops-platform
@@ -53,8 +54,9 @@ jobs:
         with:
           host: ${{ secrets.VM_HOST_PROD }}
           username: ${{ secrets.VM_USER }}
-          port: ${{ secrets.VM_PORT_PROD}}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 2223
+
           script: |
             mkdir -p /opt/devops-platform
             cd /opt/devops-platform
