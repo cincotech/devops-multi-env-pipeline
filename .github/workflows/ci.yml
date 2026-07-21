@@ -1,60 +1,109 @@
----
 name: CI Pipeline
 
 on:
   push:
-    branches: [ "main", "develop" ] # Écoute les deux branches majeures
-  tags: [ "*" ]
+    branches:
+      - main
+      - develop
+    tags:
+      - "*"
+
+# Permissions nécessaires pour GHCR et Trivy
+permissions:
+  contents: read
+  packages: write
+  security-events: write
 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
+
   build-and-push:
+
+    name: Build, Scan and Push Docker Image
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-      security-events: write
 
     steps:
+
+      # -----------------------------------------
+      # Checkout du code source
+      # -----------------------------------------
       - name: Checkout du code source
         uses: actions/checkout@v4
 
+
+      # -----------------------------------------
+      # Configuration Docker Buildx
+      # -----------------------------------------
       - name: Configuration de Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+
+      # -----------------------------------------
+      # Connexion GHCR
+      # -----------------------------------------
       - name: Connexion au GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_TOKEN }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extraction des métadonnées Docker (Tags/Labels)
+
+      # -----------------------------------------
+      # Génération automatique des tags Docker
+      # -----------------------------------------
+      - name: Extraction des métadonnées Docker
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            # Génère un tag dynamique : latest-main ou latest-develop
-            type=raw,value=latest-${{ github.ref_name }}
-            type=sha,prefix=,format=long
 
+          tags: |
+            # Tag selon la branche
+            type=raw,value=latest-${{ github.ref_name }}
+
+            # Tag basé sur le commit Git
+            type=sha,prefix=sha-,format=long
+
+
+      # -----------------------------------------
+      # Build et Push vers GHCR
+      # -----------------------------------------
       - name: Build et Push de l'image Docker
         uses: docker/build-push-action@v5
         with:
-          context: .
-          file: ./docker/Dockerfile
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Scan de sécurité avec Trivy (DevSecOps)
+          context: .
+
+          file: ./docker/Dockerfile
+
+          push: true
+
+          tags: |
+            ${{ steps.meta.outputs.tags }}
+
+          labels: |
+            ${{ steps.meta.outputs.labels }}
+
+          cache-from: type=gha
+
+          cache-to: type=gha,mode=max
+
+
+      # -----------------------------------------
+      # Scan sécurité avec Trivy
+      # -----------------------------------------
+      - name: Scan sécurité avec Trivy
         uses: aquasecurity/trivy-action@0.20.0
         with:
+
           image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest-${{ github.ref_name }}
-          format: 'table'
-          severity: 'CRITICAL, HIGH'
-          exit-code: '1' # Bloque si faille critique majeure
+
+          format: table
+
+          severity: CRITICAL,HIGH
+
+          exit-code: "1"
