@@ -45,4 +45,4 @@
   ansible.builtin.user:
     name: devops
     groups: docker
-    append: yes# tasks file for roles/docker
+    append: yes  #tasks file for roles/docker
